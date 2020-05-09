@@ -37,4 +37,4 @@ def _visdom(dataset, n):
 
 if __name__ == '__main__':
     raw_dataset = _parse_record(train_tfrecord)    # 读取 TFRecord 文件
-    _visdom(raw_dataset, 10)
+    _visdom(raw_dataset, 10) # show image, last param mean show number
