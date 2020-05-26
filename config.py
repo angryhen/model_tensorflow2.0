@@ -1,9 +1,13 @@
 
 # prepare datasets
-src_dataset = '/home/du/Desktop/my_project/Basic_CNNs_TensorFlow2/dataset'
-dst_datadir = 'tfrecord/'
-train_tfrecord = dst_datadir + 'train.tfrecord'
-valid_tfrecord= dst_datadir + 'valid.tfrecord'
-test_tfrecord = dst_datadir + 'test.tfrecord'
+data_dir = '/home/du/Desktop/dataset/ibox/cls'
+tfrecord_dir = 'tfrecord/'
+train_tfrecord = tfrecord_dir + 'train.tfrecord'
+valid_tfrecord= tfrecord_dir + 'valid.tfrecord'
+test_tfrecord = tfrecord_dir + 'test.tfrecord'
 
-size = 224
+SIZE = 224
+BATCH_SIZE = 32
+LEARNING_RATE = 0.001
+EPOCHES = 20
+WARMUP_EPOCH = 1

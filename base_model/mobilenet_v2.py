@@ -74,9 +74,9 @@ class _Inverted_res_block(keras.Model):
             x = keras.layers.Add(name=self.prefix+'add')([inputs, x])
         return x
 
-class Mbnet_v2(keras.Model):
+class Mobilenet_v2(keras.Model):
     def __init__(self, alpha=1, **kwargs):
-        super(Mbnet_v2, self).__init__(**kwargs)
+        super(Mobilenet_v2, self).__init__(**kwargs)
         self.alpha = alpha
         self.Padding = keras.layers.ZeroPadding2D((1,1), name='conv1_pad')
         self.conv1 = keras.layers.Conv2D(filters=32,
@@ -169,7 +169,7 @@ class Mbnet_v2(keras.Model):
         return x
 
 if __name__ == '__main__':
-    model = Mbnet_v2(alpha=1)
+    model = Mobilenet_v2(alpha=1)
     model.build(input_shape=(None, 224, 224, 3))
     model.summary()
 
