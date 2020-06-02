@@ -21,20 +21,45 @@ class CustomSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
 
     def __call__(self, step):
         learning_rate = self.min_lr + 0.5 * ((self.lr - self.min_lr) *
-                                             (1 + np.cos(np.pi * (step - self.warmup_steps)
+                                             (1 + tf.math.cos(3.141592653589793 * (step - self.warmup_steps)
                                                          / float(self.total_steps - self.warmup_steps))))
         if self.warmup_steps > 0:
             # linear increase
             slope = (self.lr - self.warmup_init_rate) / self.warmup_steps
             warmup_rate = slope * step + self.warmup_init_rate
-            learning_rate = np.where(step < self.warmup_steps,
+            learning_rate = tf.where(step < self.warmup_steps,
                                      warmup_rate, learning_rate)
         return learning_rate
 
 
+class test(tf.keras.optimizers.schedules.LearningRateSchedule):
+
+    def __init__(self, d_model, warmup_steps=10):
+        super(test, self).__init__()
+
+        self.d_model = d_model
+        self.d_model = tf.cast(self.d_model, tf.float32)
+
+        self.warmup_steps = warmup_steps
+
+    def __call__(self, step):
+        arg1 = tf.math.rsqrt(step)
+        arg2 = step * (self.warmup_steps**-1.5)
+
+        return tf.math.rsqrt(self.d_model) * tf.math.minimum(arg1, arg2)
+
+    def get_config(self):
+        config = {
+            'd_model':self.d_model,
+            'warmup_steps':self.warmup_steps
+
+        }
+        base_config = super(test, self).get_config()
+        return dict(list(base_config.items()) + list(config.items()))
+
 if __name__ == '__main__':
-    lr = CustomSchedule(lr=0.01, total_steps=30000, warmup_steps=300, min_lr=0.003)
-    plt.plot(lr(tf.range(30000, dtype=tf.float32)))
+    lr = CustomSchedule(lr=0.001, total_steps=560, warmup_steps=28, min_lr=0.0001)
+    plt.plot(lr(tf.range(560, dtype=tf.float32)))
     plt.xlabel('learning rate')
     plt.ylabel('train step')
     plt.show()

@@ -1,5 +1,5 @@
 import tensorflow as tf
-from config import train_tfrecord, valid_tfrecord, test_tfrecord, size
+from config import train_tfrecord, valid_tfrecord, test_tfrecord, SIZE
 
 from albumentations import CLAHE, GaussianBlur, IAASharpen, OpticalDistortion, GridDistortion, IAAPiecewiseAffine
 from albumentations import OneOf, Compose, IAAEmboss, HueSaturationValue, IAAAdditiveGaussianNoise, GaussNoise
@@ -16,7 +16,7 @@ def _parse_example(example_string):
     }
     feature_dict = tf.io.parse_single_example(example_string, feature_description)
     feature_dict['img_raw'] = tf.image.decode_jpeg(feature_dict['img_raw'])  # 解码JPEG图片
-    feature_dict['img_raw'] = tf.image.resize(feature_dict['img_raw'], (size, size))
+    feature_dict['img_raw'] = tf.image.resize(feature_dict['img_raw'], (SIZE, SIZE))
     # norm [0-1]
     feature_dict['img_raw'] = feature_dict['img_raw'] / 255.0
     return feature_dict['img_raw'], feature_dict['label']
@@ -24,7 +24,7 @@ def _parse_example(example_string):
 
 def _parse_record(tfrecord_file):
     dataset = tf.data.TFRecordDataset(tfrecord_file)
-    dataset = dataset.map(_parse_example)
+    dataset = dataset.map(_parse_example, num_parallel_calls=tf.data.experimental.AUTOTUNE)
     return dataset
 
 
@@ -87,5 +87,5 @@ def _visdom(dataset, n):
 
 
 if __name__ == '__main__':
-    raw_dataset = _parse_record(train_tfrecord)  # 读取 TFRecord 文件
+    raw_dataset = _parse_record(valid_tfrecord)  # 读取 TFRecord 文件
     _visdom(raw_dataset, 10)  # show image, last param mean show number

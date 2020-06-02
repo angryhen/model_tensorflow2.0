@@ -193,7 +193,7 @@ def resnet38():
 
 
 def resnet50():
-    return ResNet(Block, [3, 4, 6, 3], num_classes=1000)
+    return ResNet(Block, [3, 4, 6, 3], num_classes=15)
 
 
 def resnet101():

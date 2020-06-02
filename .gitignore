@@ -3,3 +3,6 @@ __pycache__/
 tfrecord/*
 !.gitignore
 *.tfrecord
+data/dataset
+logs
+

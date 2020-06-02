@@ -21,7 +21,7 @@ Various basic models code by tensorflow2.x,now included:
 
 - [x] TF-record
 - [x] Config-file
-- [ ] Train
+- [x] Train
 - [ ] Eval
 - [ ] Predict
 - [ ] Performance

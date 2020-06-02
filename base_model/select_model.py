@@ -1,3 +1,5 @@
+from base_model import ResNet
+
 def model():
-    model = None
+    model = ResNet.resnet50()
     return model
