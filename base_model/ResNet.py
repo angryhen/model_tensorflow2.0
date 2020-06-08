@@ -6,14 +6,18 @@ from tensorflow import keras
 class Basic_Block(keras.Model):
     ''' basic block constructing the layers for resNet18 and resNet34
     '''
-    def __init__(self, filters, downsample=False, stride=1):
+    def __init__(self, filters, block_name,
+                downsample=False, stride=1):
         self.expasion = 1
         super(Basic_Block, self).__init__()
+        conv_name = 'res' + block_name + '_branch'
+        bn_name = 'bn' + block_name + '_branch'
 
         self.downsample = downsample
 
         self.conv2a = keras.layers.Conv2D(filters=filters,
                                           kernel_size=3,
+                                          padding='same',
                                           strides=stride,
                                           kernel_initializer='he_normal',
                                           )
@@ -217,6 +221,7 @@ def resnet152():
 
 
 if __name__ == '__main__':
-    model = resnet50()
+    model = resnet18()
     model.build(input_shape=(None, 224, 224, 3))
     model.summary()
+    print('>>> debug')
