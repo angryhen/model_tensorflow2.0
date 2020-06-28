@@ -4,15 +4,20 @@ from tensorflow import keras
 
 # for 18 or 34 layers
 class Basic_Block(keras.Model):
-
-    def __init__(self, filters, downsample=False, stride=1):
+    ''' basic block constructing the layers for resNet18 and resNet34
+    '''
+    def __init__(self, filters, block_name,
+                downsample=False, stride=1):
         self.expasion = 1
         super(Basic_Block, self).__init__()
+        conv_name = 'res' + block_name + '_branch'
+        bn_name = 'bn' + block_name + '_branch'
 
         self.downsample = downsample
 
         self.conv2a = keras.layers.Conv2D(filters=filters,
                                           kernel_size=3,
+                                          padding='same',
                                           strides=stride,
                                           kernel_initializer='he_normal',
                                           )
@@ -58,7 +63,8 @@ class Basic_Block(keras.Model):
 
 # for 50, 101 or 152 layers
 class Block(keras.Model):
-
+    ''' basic block constructing the layers for resNet50, resNet101 and resNet152
+    '''
     def __init__(self, filters, block_name,
                  downsample=False, stride=1, **kwargs):
         self.expasion = 4
@@ -121,7 +127,17 @@ class Block(keras.Model):
 
 
 class ResNet(keras.Model):
+    ''' class for resNet18, resNet34, resNet50, resNet101 and resNet152
+    '''
     def __init__(self, block, layers, num_classes=1000, **kwargs):
+        ''' init
+
+            :param block: block object. block = Block for resNet50, resNet101, resNet152;
+                                        block = Basic_Block for resNet18, resNet34;
+            :param layers: list. layer structure according to resNet.
+            :param num_classes: int. num of classes.
+            :param **kwargs: **kwargs
+        '''
         super(ResNet, self).__init__(**kwargs)
 
         self.padding = keras.layers.ZeroPadding2D((3, 3))
@@ -205,6 +221,7 @@ def resnet152():
 
 
 if __name__ == '__main__':
-    model = resnet50()
+    model = resnet18()
     model.build(input_shape=(None, 224, 224, 3))
     model.summary()
+    print('>>> debug')
