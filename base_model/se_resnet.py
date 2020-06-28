@@ -167,7 +167,7 @@ class ResNet(keras.Model):
                                                   strides=2,
                                                   padding='same')
         self.avgpool = keras.layers.GlobalAveragePooling2D(name='avg_pool')
-        self.fc = keras.layers.Dense(num_classes, activation='softmax', name='result')
+        self.fc = keras.layers.Dense(num_classes, name='result')
 
         # layer2
         self.res2 = self.mid_layer(block, 64, layers[0], stride=1, layer_number=2)
@@ -225,7 +225,7 @@ def resnet38():
 
 
 def resnet50():
-    return ResNet(Block, [3, 4, 6, 3], num_classes=1000)
+    return ResNet(Block, [3, 4, 6, 3], num_classes=15)
 
 
 def resnet101():

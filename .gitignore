@@ -5,4 +5,6 @@ tfrecord/*
 *.tfrecord
 data/dataset
 logs
-
+test.py
+config.py
+tf_ckpts

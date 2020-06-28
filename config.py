@@ -7,10 +7,10 @@ valid_tfrecord= tfrecord_dir + 'valid.tfrecord'
 test_tfrecord = tfrecord_dir + 'test.tfrecord'
 
 SIZE = 224
-BATCH_SIZE = 32
+BATCH_SIZE = 48
 LEARNING_RATE = 0.001
 END_LR_RATE = 0.00001
-EPOCHES = 100
+EPOCHES = 50
 WARMUP_EPOCH = 1
 
 TRAIN_SET_RATIO = 0.8

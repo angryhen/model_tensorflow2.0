@@ -169,7 +169,6 @@ class ResNet(keras.Model):
         x = self.bn_conv1(x)
         x = tf.nn.relu(x)
         x = self.max_pool(x)
-
         # layer2
         x = self.res2(x)
         # layer3
@@ -193,7 +192,7 @@ def resnet38():
 
 
 def resnet50():
-    return ResNet(Block, [3, 4, 6, 3], num_classes=15)
+    return ResNet(Block, [3, 4, 6, 3], num_classes=1000)
 
 
 def resnet101():

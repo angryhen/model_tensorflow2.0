@@ -1,6 +1,7 @@
 import numpy as np
 import tensorflow as tf
 
+from data.augment import data_augment
 from base_model import select_model
 from data.parse_tfrecord import _parse_record
 from utils.lr_schedual import CustomSchedule, test
@@ -32,7 +33,7 @@ def get_datasets():
         len_valid += 1
     print(f'train:{len_train}, valid: {len_valid}')
 
-    train_dataset = train_dataset.shuffle(len_train // 2).batch(config.BATCH_SIZE)
+    train_dataset = train_dataset.shuffle(len_train).batch(config.BATCH_SIZE).prefetch(tf.data.experimental.AUTOTUNE)
     valid_dataset = valid_dataset.batch(config.BATCH_SIZE)
 
     return train_dataset, valid_dataset, len_train, len_valid
@@ -49,16 +50,16 @@ def main():
     model = select_model.model()
 
     # loss
-    loss = tf.keras.losses.SparseCategoricalCrossentropy()  # [1, 2] -> [[0.05, 0.95, 0], [0.1, 0.8, 0.1]]
+    loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)  # [1, 2] -> [[0.05, 0.95, 0], [0.1, 0.8, 0.1]]
     lr_schedule = CustomSchedule(lr=config.LEARNING_RATE,
                                  total_steps=config.total_step,
                                  warmup_steps=config.warmup_steps,
                                  min_lr=config.END_LR_RATE)
     optimizer = tf.keras.optimizers.Adam(learning_rate=lr_schedule)
 
-    # checkpoint
+    # checkpoint summary_writer
     checkpoint = tf.train.Checkpoint(step=tf.Variable(0), optimizer=optimizer, model=model)
-    manager = tf.train.CheckpointManager(checkpoint, './tf_ckpts', max_to_keep=5)
+    manager = tf.train.CheckpointManager(checkpoint, directory='./tf_ckpts', max_to_keep=5)
     summary_writer = tf.summary.create_file_writer('./logs')
 
     # metrics
@@ -71,17 +72,25 @@ def main():
     # train
     # train(train_dataset, valid_dataset, model, config, loss, optimizer,
     #       train_loss, train_acc, valid_loss, valid_acc, summary_writer)
-
+    step_num = 0
     for epoch in tf.range(1, config.EPOCHES):
         # train
         step = 0
         for x, y in train_dataset:
+            x = data_augment(x)
             step += 1
+            step_num += 1
             train_step(x, y, model, loss, optimizer, train_loss, train_acc)
             tf.print(f'Epoch: {epoch}/ {config.EPOCHES},'
                      f'step: {step} / {config.step_per_epoch},'
+                     f'lr: {optimizer._decayed_lr(tf.float32):.5f}'
                      f'loss: {train_loss.result():.5f},'
                      f'acc: {train_acc.result():.5f}')
+
+            # write in tensorboard
+            with summary_writer.as_default():
+                tf.summary.scalar('loss/train_loss', train_loss.result(), step=step_num)
+                tf.summary.scalar('learning_rate', float(optimizer._decayed_lr(tf.float32)), step=step_num)
 
         # valid
         for x, y in valid_dataset:
@@ -89,11 +98,21 @@ def main():
         tf.print(f'loss: {valid_loss.result():.5f},'
                  f'acc: {valid_acc.result():.5f}')
 
+        # write in tensorboard
+        with summary_writer.as_default():
+            tf.summary.scalar('loss/valid_loss', valid_loss.result(), step=step_num)
+            tf.summary.scalar('accuracy/train_acc', train_acc.result(), step=step_num)
+            tf.summary.scalar('accuracy/valid_acc', valid_acc.result(), step=step_num)
+
         # reset metric
         train_loss.reset_states()
         train_acc.reset_states()
         valid_loss.reset_states()
         valid_acc.reset_states()
+
+        # save model
+        cpkt_path = manager.save()
+        print(f'saving checkpoint: {cpkt_path}')
 
 
 if __name__ == '__main__':

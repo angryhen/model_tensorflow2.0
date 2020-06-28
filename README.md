@@ -15,8 +15,6 @@ Various basic models code by tensorflow2.x,now included:
 - [x] MobileNet_v2
 - [x] SE-Resnet
 
-
-
 ### Update log
 
 - [x] TF-record
@@ -25,3 +23,28 @@ Various basic models code by tensorflow2.x,now included:
 - [ ] Eval
 - [ ] Predict
 - [ ] Performance
+
+### Prepare Datasets
+1. use *split_dataset.py* to split train/valid/test data
+```bash
+# change path of dataset_dir in config.py's split_dataset
+python split_datdaset.py 
+```
+2. create TF-record
+```bash
+python create_tfrecord.py
+```
+
+### Change param
+
+All parameters are saved in **config.py** , and you can modify it to suit yout training.
+
+### Train
+
+```ba
+python train.py
+```
+
+### Eval
+
+- [ ] TODO
